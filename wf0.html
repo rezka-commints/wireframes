@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adversarial Training Module</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+        }
+
+        .mockup-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+
+        .content {
+            background: #FAFAFA;
+            padding: 60px;
+        }
+
+        .feature-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: #D32F2F;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(211, 47, 47, 0.2);
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .search-section {
+            margin-bottom: 40px;
+        }
+
+        .search-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .search-label {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 16px 20px;
+            font-size: 18px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            background: #F5F5F5;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .info-box {
+            background: #FFEBEE;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin-bottom: 32px;
+            border-left: 4px solid #D32F2F;
+        }
+
+        .info-text {
+            font-size: 15px;
+            color: #B71C1C;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .section-header {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .example-card {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            border: 2px solid #E0E0E0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .example-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .example-number {
+            display: inline-block;
+            padding: 6px 12px;
+            background: #D32F2F;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            border-radius: 4px;
+        }
+
+        .manipulation-type {
+            font-size: 13px;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #1a1a1a;
+        }
+
+        .result-snippet {
+            font-size: 15px;
+            line-height: 1.6;
+            color: #555;
+            margin-bottom: 16px;
+        }
+
+        .result-meta {
+            display: flex;
+            gap: 24px;
+            font-size: 14px;
+            color: #888;
+            margin-bottom: 16px;
+            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+        }
+
+        .question {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 20px 0 12px 0;
+            color: #D32F2F;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .option-button {
+            padding: 12px 16px;
+            border: 2px solid #E0E0E0;
+            border-radius: 6px;
+            background: white;
+            font-size: 15px;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .option-button:hover {
+            border-color: #D32F2F;
+            background: #FFEBEE;
+        }
+
+        .option-button.selected {
+            border-color: #D32F2F;
+            background: #FFEBEE;
+        }
+
+        .option-button.correct {
+            border-color: #2E7D32;
+            background: #E8F5E9;
+        }
+
+        .option-button.incorrect {
+            border-color: #C62828;
+            background: #FFEBEE;
+        }
+
+        .check-answer-btn {
+            padding: 12px 24px;
+            background: #D32F2F;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .check-answer-btn:hover {
+            background: #B71C1C;
+        }
+
+        .check-answer-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .feedback {
+            margin-top: 16px;
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .feedback.show {
+            display: block;
+        }
+
+        .feedback.correct {
+            background: #E8F5E9;
+            border-left: 4px solid #2E7D32;
+        }
+
+        .feedback.incorrect {
+            background: #FFEBEE;
+            border-left: 4px solid #C62828;
+        }
+
+        .feedback-title {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .feedback-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .indicators-box {
+            margin-top: 12px;
+            padding: 12px;
+            background: #FFF9E6;
+            border-radius: 6px;
+        }
+
+        .indicators-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #F57F17;
+            margin-bottom: 8px;
+        }
+
+        .indicators-list {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.6;
+        }
+
+        .key-patterns {
+            background: white;
+            padding: 24px;
+            border-radius: 8px;
+            margin-top: 32px;
+            border: 2px solid #D32F2F;
+        }
+
+        .patterns-title {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: #D32F2F;
+        }
+
+        .patterns-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .pattern-item {
+            display: flex;
+            gap: 12px;
+            padding: 12px;
+            background: #FAFAFA;
+            border-radius: 6px;
+        }
+
+        .pattern-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .pattern-text {
+            font-size: 14px;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .pattern-label {
+            font-weight: 600;
+            color: #333;
+        }
+    </style>
+    <script>
+        const examples = {
+            1: {
+                correct: 'b',
+                feedback: {
+                    title: 'Correct! This is keyword stuffing.',
+                    text: 'The title unnaturally repeats "climate change" and "solutions" to manipulate keyword-based ranking algorithms. Real titles are more natural.',
+                    indicators: '• Unnatural repetition of query terms\n• Title reads awkwardly\n• Designed for algorithms, not humans'
+                }
+            },
+            2: {
+                correct: 'c',
+                feedback: {
+                    title: 'Correct! This is domain spoofing.',
+                    text: 'The domain "ipcc-official.biz" looks official but uses .biz instead of the real ipcc.ch. This tricks users into thinking it\'s the authoritative source.',
+                    indicators: '• Suspicious TLD (.biz instead of .ch or .org)\n• "Official" in domain name (real sites rarely do this)\n• Similar to real domain but slightly different'
+                }
+            },
+            3: {
+                correct: 'a',
+                feedback: {
+                    title: 'Correct! This is content manipulation.',
+                    text: 'The snippet mentions "natural cycles" and downplays human impact - common climate denial framing that contradicts scientific consensus.',
+                    indicators: '• Contradicts established scientific consensus\n• Uses misleading framing ("just natural cycles")\n• May be commercially or politically motivated'
+                }
+            }
+        };
+
+        let selectedAnswers = {};
+
+        function selectOption(exampleNum, option) {
+            selectedAnswers[exampleNum] = option;
+            
+            // Visual feedback
+            const buttons = document.querySelectorAll(`.example-${exampleNum} .option-button`);
+            buttons.forEach(btn => btn.classList.remove('selected'));
+            event.target.classList.add('selected');
+            
+            // Enable check button
+            document.getElementById(`check-${exampleNum}`).disabled = false;
+        }
+
+        function checkAnswer(exampleNum) {
+            const selected = selectedAnswers[exampleNum];
+            const correct = examples[exampleNum].correct;
+            const feedback = document.getElementById(`feedback-${exampleNum}`);
+            const buttons = document.querySelectorAll(`.example-${exampleNum} .option-button`);
+            
+            // Mark correct/incorrect
+            buttons.forEach(btn => {
+                const value = btn.getAttribute('data-value');
+                if (value === correct) {
+                    btn.classList.add('correct');
+                } else if (value === selected && value !== correct) {
+                    btn.classList.add('incorrect');
+                }
+                btn.style.pointerEvents = 'none';
+            });
+            
+            // Show feedback
+            feedback.classList.add('show');
+            if (selected === correct) {
+                feedback.classList.add('correct');
+            } else {
+                feedback.classList.add('incorrect');
+            }
+            
+            feedback.querySelector('.feedback-title').textContent = 
+                selected === correct ? examples[exampleNum].feedback.title : 'Not quite. Look for the indicators below:';
+            feedback.querySelector('.feedback-text').textContent = examples[exampleNum].feedback.text;
+            feedback.querySelector('.indicators-list').textContent = examples[exampleNum].feedback.indicators;
+            
+            // Disable check button
+            document.getElementById(`check-${exampleNum}`).disabled = true;
+        }
+    </script>
+</head>
+<body>
+    <div class="mockup-container">
+        <div class="content">
+            <div class="feature-banner">
+                <div class="feature-title">Adversarial Training: Learn to Spot Manipulation</div>
+            </div>
+
+            <div class="search-section">
+                <h1 class="search-title">Search</h1>
+                <div class="search-label">Query being audited:</div>
+                <div class="search-input-wrapper">
+                    <input type="text" class="search-input" value="climate change solutions" readonly>
+                </div>
+            </div>
+
+            <div class="info-box">
+                <div class="info-text">
+                    Before auditing, practice identifying manipulation. Below are 3 examples showing different types of adversarial tactics used to game search rankings. Try to identify which result in each set has been manipulated.
+                </div>
+            </div>
+
+            <h2 class="section-header">Training Examples</h2>
+
+            <!-- Example 1: Keyword Stuffing -->
+            <div class="example-card example-1">
+                <div class="example-header">
+                    <span class="example-number">EXAMPLE 1</span>
+                    <span class="manipulation-type">Type: Keyword Manipulation</span>
+                </div>
+
+                <div class="question">Which result shows signs of manipulation?</div>
+
+                <div class="options">
+                    <button class="option-button" data-value="a" onclick="selectOption(1, 'a')">
+                        <strong>Result A:</strong> Climate Change - Wikipedia<br>
+                        <small style="color: #888;">Source: wikipedia.org</small>
+                    </button>
+                    <button class="option-button" data-value="b" onclick="selectOption(1, 'b')">
+                        <strong>Result B:</strong> Climate Change Solutions Climate Change Solutions Best Climate Solutions<br>
+                        <small style="color: #888;">Source: climate-info-solutions.com</small>
+                    </button>
+                    <button class="option-button" data-value="c" onclick="selectOption(1, 'c')">
+                        <strong>Result C:</strong> IPCC Climate Change Mitigation Report<br>
+                        <small style="color: #888;">Source: ipcc.ch</small>
+                    </button>
+                </div>
+
+                <button class="check-answer-btn" id="check-1" onclick="checkAnswer(1)" disabled>Check Answer</button>
+
+                <div class="feedback" id="feedback-1">
+                    <div class="feedback-title"></div>
+                    <div class="feedback-text"></div>
+                    <div class="indicators-box">
+                        <div class="indicators-title">Red Flags to Remember:</div>
+                        <pre class="indicators-list"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example 2: Domain Spoofing -->
+            <div class="example-card example-2">
+                <div class="example-header">
+                    <span class="example-number">EXAMPLE 2</span>
+                    <span class="manipulation-type">Type: Domain Spoofing</span>
+                </div>
+
+                <div class="question">Which result shows signs of manipulation?</div>
+
+                <div class="options">
+                    <button class="option-button" data-value="a" onclick="selectOption(2, 'a')">
+                        <strong>Result A:</strong> Renewable Energy Technologies Guide<br>
+                        <small style="color: #888;">Source: energy.gov</small>
+                    </button>
+                    <button class="option-button" data-value="b" onclick="selectOption(2, 'b')">
+                        <strong>Result B:</strong> UN Climate Action Framework<br>
+                        <small style="color: #888;">Source: un.org</small>
+                    </button>
+                    <button class="option-button" data-value="c" onclick="selectOption(2, 'c')">
+                        <strong>Result C:</strong> IPCC Official Climate Report<br>
+                        <small style="color: #888;">Source: ipcc-official.biz</small>
+                    </button>
+                </div>
+
+                <button class="check-answer-btn" id="check-2" onclick="checkAnswer(2)" disabled>Check Answer</button>
+
+                <div class="feedback" id="feedback-2">
+                    <div class="feedback-title"></div>
+                    <div class="feedback-text"></div>
+                    <div class="indicators-box">
+                        <div class="indicators-title">Red Flags to Remember:</div>
+                        <pre class="indicators-list"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Example 3: Content Manipulation -->
+            <div class="example-card example-3">
+                <div class="example-header">
+                    <span class="example-number">EXAMPLE 3</span>
+                    <span class="manipulation-type">Type: Misleading Content</span>
+                </div>
+
+                <div class="question">Which result shows signs of manipulation?</div>
+
+                <div class="options">
+                    <button class="option-button" data-value="a" onclick="selectOption(3, 'a')">
+                        <strong>Result A:</strong> Climate Change: Natural Cycles Explained<br>
+                        <small style="color: #888;">Snippet: "Climate has always changed naturally. Current warming is part of Earth's natural cycles, not primarily caused by human activity."</small><br>
+                        <small style="color: #888;">Source: climaterealist.org</small>
+                    </button>
+                    <button class="option-button" data-value="b" onclick="selectOption(3, 'b')">
+                        <strong>Result B:</strong> Carbon Reduction Strategies<br>
+                        <small style="color: #888;">Snippet: "Peer-reviewed analysis of evidence-based carbon reduction strategies across industrial, agricultural, and energy sectors."</small><br>
+                        <small style="color: #888;">Source: nature.com</small>
+                    </button>
+                    <button class="option-button" data-value="c" onclick="selectOption(3, 'c')">
+                        <strong>Result C:</strong> Paris Agreement Implementation Guide<br>
+                        <small style="color: #888;">Snippet: "Detailed guidance on implementing Paris Agreement commitments, including nationally determined contributions."</small><br>
+                        <small style="color: #888;">Source: unfccc.int</small>
+                    </button>
+                </div>
+
+                <button class="check-answer-btn" id="check-3" onclick="checkAnswer(3)" disabled>Check Answer</button>
+
+                <div class="feedback" id="feedback-3">
+                    <div class="feedback-title"></div>
+                    <div class="feedback-text"></div>
+                    <div class="indicators-box">
+                        <div class="indicators-title">Red Flags to Remember:</div>
+                        <pre class="indicators-list"></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Key Patterns Summary -->
+            <div class="key-patterns">
+                <div class="patterns-title">Key Manipulation Patterns to Remember</div>
+                <div class="patterns-list">
+                    <div class="pattern-item">
+                        <div class="pattern-icon">⚠️</div>
+                        <div class="pattern-text">
+                            <span class="pattern-label">Keyword Stuffing:</span> Unnatural repetition of search terms in titles or content. Designed to trick ranking algorithms rather than inform users.
+                        </div>
+                    </div>
+                    <div class="pattern-item">
+                        <div class="pattern-icon">🎭</div>
+                        <div class="pattern-text">
+                            <span class="pattern-label">Domain Spoofing:</span> Domains that look similar to authoritative sources but use different TLDs (.biz, .info) or add words like "official" to appear legitimate.
+                        </div>
+                    </div>
+                    <div class="pattern-item">
+                        <div class="pattern-icon">📰</div>
+                        <div class="pattern-text">
+                            <span class="pattern-label">Content Manipulation:</span> Information that contradicts scientific consensus, uses misleading framing, or may be commercially/politically motivated to rank for certain queries.
+                        </div>
+                    </div>
+                    <div class="pattern-item">
+                        <div class="pattern-icon">🔍</div>
+                        <div class="pattern-text">
+                            <span class="pattern-label">Always verify:</span> Check domain authenticity, look for unnatural language patterns, and question content that seems designed to confirm a particular viewpoint rather than inform.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
