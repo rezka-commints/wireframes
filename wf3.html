@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Counterfactual Explorer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .feature-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: #1976D2;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .search-section {
+            margin-top: 24px;
+        }
+
+        .search-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .search-label {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 16px 20px;
+            font-size: 18px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            background: #F5F5F5;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .header-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .controls-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .controls-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1976D2;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        .control-item {
+            padding: 12px;
+            background: #FAFAFA;
+            border-radius: 6px;
+            border: 1px solid #E0E0E0;
+        }
+
+        .control-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .slider-container {
+            margin-top: 8px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #E0E0E0;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #2196F3;
+            cursor: pointer;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            font-size: 10px;
+            color: #999;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .select-dropdown {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #E0E0E0;
+            border-radius: 4px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .reset-button {
+            padding: 8px 16px;
+            background: #F5F5F5;
+            border: 1px solid #E0E0E0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .reset-button:hover {
+            background: #EEEEEE;
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .results-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .panel-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #E0E0E0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            background: #E3F2FD;
+            color: #1976D2;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .result-item {
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .result-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .result-item.moved-up {
+            border-color: #4CAF50;
+            background: #F1F8F4;
+        }
+
+        .result-item.moved-down {
+            border-color: #FF9800;
+            background: #FFF8F0;
+        }
+
+        .result-item.removed {
+            border-color: #999;
+            background: #F5F5F5;
+            opacity: 0.6;
+        }
+
+        .result-item.new {
+            border-color: #2196F3;
+            background: #E3F2FD;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+
+        .result-position {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1976D2;
+            min-width: 30px;
+        }
+
+        .result-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 12px;
+        }
+
+        .result-meta {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            background: #F5F5F5;
+            border-radius: 12px;
+            color: #666;
+        }
+
+        .meta-badge.source {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .meta-badge.type {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .result-snippet {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            font-size: 11px;
+            border: 1px solid #E0E0E0;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            background: #F5F5F5;
+            border-color: #2196F3;
+            color: #2196F3;
+        }
+
+        .action-btn.promote {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        .action-btn.promote:hover {
+            background: #E8F5E9;
+        }
+
+        .action-btn.remove {
+            border-color: #F44336;
+            color: #F44336;
+        }
+
+        .action-btn.remove:hover {
+            background: #FFEBEE;
+        }
+
+        .change-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .change-indicator.up {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .change-indicator.down {
+            background: #FF9800;
+            color: white;
+        }
+
+        .change-indicator.new {
+            background: #2196F3;
+            color: white;
+        }
+
+        .change-indicator.removed {
+            background: #999;
+            color: white;
+        }
+
+        .group-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1976D2;
+            margin: 16px 0 8px 0;
+            padding: 8px 12px;
+            background: #E3F2FD;
+            border-radius: 4px;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            padding: 12px;
+            background: #FFF9E6;
+            border-radius: 6px;
+            margin-top: 16px;
+            border-left: 4px solid #FFC107;
+        }
+
+        .stat-item {
+            font-size: 12px;
+        }
+
+        .stat-label {
+            color: #F57F17;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: #666;
+            margin-left: 4px;
+        }
+    </style>
+    <script>
+        // Original results data
+        const originalResults = [
+            {id: 1, title: 'IPCC Climate Change Mitigation Report', source: 'ipcc.ch', type: 'Government', date: '2023', snippet: 'Comprehensive assessment of strategies for reducing greenhouse gas emissions, including renewable energy deployment.'},
+            {id: 2, title: 'Climate Change - Wikipedia', source: 'wikipedia.org', type: 'Encyclopedia', date: '2024', snippet: 'Comprehensive encyclopedia entry covering climate science, global warming causes, and potential mitigation strategies.'},
+            {id: 3, title: 'UN Climate Summit Outcomes 2024', source: 'reuters.com', type: 'News', date: '2024', snippet: 'Latest developments from the international climate negotiations including emissions targets and renewable energy commitments.'},
+            {id: 4, title: 'Renewable Energy Technologies Overview', source: 'un.org', type: 'Government', date: '2021', snippet: 'Survey of current and emerging renewable energy technologies including solar photovoltaics, wind power, hydroelectric systems.'},
+            {id: 5, title: 'Carbon Sequestration Methods', source: 'wikipedia.org', type: 'Encyclopedia', date: '2023', snippet: 'Overview of carbon capture and storage technologies, natural carbon sinks, and geoengineering approaches.'},
+            {id: 6, title: 'Global Renewable Energy Growth Report', source: 'nytimes.com', type: 'News', date: '2024', snippet: 'Analysis of worldwide trends in solar, wind, and hydroelectric power adoption, showing record investment.'},
+            {id: 7, title: 'Paris Agreement - Wikipedia', source: 'wikipedia.org', type: 'Encyclopedia', date: '2022', snippet: 'International treaty on climate change adopted in 2015, with goals to limit global warming.'},
+            {id: 8, title: 'Climate Solutions in Policy Debates', source: 'reuters.com', type: 'News', date: '2024', snippet: 'Recent policy discussions on climate mitigation strategies, covering renewable energy mandates.'},
+        ];
+
+        let currentResults = JSON.parse(JSON.stringify(originalResults));
+        let removedIds = new Set();
+
+        function initializeResults() {
+            renderResults('original-results', originalResults, false);
+            renderResults('adjusted-results', currentResults, true);
+            updateStats();
+        }
+
+        function toggleRecency(checked) {
+            if (checked) {
+                // Sort by date (newer first)
+                currentResults = JSON.parse(JSON.stringify(originalResults))
+                    .filter(r => !removedIds.has(r.id))
+                    .sort((a, b) => parseInt(b.date) - parseInt(a.date));
+            } else {
+                // Original order
+                currentResults = JSON.parse(JSON.stringify(originalResults)).filter(r => !removedIds.has(r.id));
+            }
+            applyGrouping();
+        }
+
+        function toggleDiversity(checked) {
+            if (checked) {
+                // Keep only first result per domain
+                const seenDomains = new Set();
+                currentResults = currentResults.filter(r => {
+                    if (seenDomains.has(r.source)) {
+                        return false;
+                    }
+                    seenDomains.add(r.source);
+                    return true;
+                });
+            } else {
+                // Reset to full list
+                const recencyToggle = document.getElementById('recency-toggle');
+                toggleRecency(recencyToggle.checked);
+            }
+            applyGrouping();
+        }
+
+        function applyGrouping() {
+            const grouping = document.getElementById('grouping-select').value;
+            renderResults('adjusted-results', currentResults, true, grouping);
+            updateStats();
+        }
+
+        function promoteResult(id) {
+            const index = currentResults.findIndex(r => r.id === id);
+            if (index > 0) {
+                [currentResults[index], currentResults[index - 1]] = [currentResults[index - 1], currentResults[index]];
+                renderResults('adjusted-results', currentResults, true);
+                updateStats();
+            }
+        }
+
+        function removeResult(id) {
+            removedIds.add(id);
+            currentResults = currentResults.filter(r => r.id !== id);
+            
+            // Add next result from original list if available
+            const originalLength = originalResults.length;
+            const currentLength = currentResults.length + removedIds.size;
+            if (currentLength < originalLength) {
+                const nextResult = originalResults[currentLength];
+                if (!removedIds.has(nextResult.id)) {
+                    currentResults.push(JSON.parse(JSON.stringify(nextResult)));
+                }
+            }
+            
+            applyGrouping();
+        }
+
+        function resetAdjustments() {
+            currentResults = JSON.parse(JSON.stringify(originalResults));
+            removedIds.clear();
+            document.getElementById('recency-toggle').checked = false;
+            document.getElementById('diversity-toggle').checked = false;
+            document.getElementById('grouping-select').value = 'none';
+            applyGrouping();
+        }
+
+        function renderResults(containerId, results, showActions, grouping = 'none') {
+            const container = document.getElementById(containerId);
+            let html = '';
+            
+            if (grouping === 'none') {
+                html = results.map((result, index) => renderResultItem(result, index, showActions)).join('');
+            } else {
+                // Group by type
+                const groups = {};
+                results.forEach(result => {
+                    if (!groups[result.type]) groups[result.type] = [];
+                    groups[result.type].push(result);
+                });
+                
+                let position = 0;
+                Object.keys(groups).sort().forEach(type => {
+                    html += `<div class="group-header">${type} Sources</div>`;
+                    groups[type].forEach(result => {
+                        html += renderResultItem(result, position, showActions);
+                        position++;
+                    });
+                });
+            }
+            
+            container.innerHTML = html;
+        }
+
+        function renderResultItem(result, index, showActions) {
+            const originalIndex = originalResults.findIndex(r => r.id === result.id);
+            let changeIndicator = '';
+            let changeClass = '';
+            
+            if (showActions && originalIndex !== -1) {
+                if (index < originalIndex) {
+                    changeIndicator = `<span class="change-indicator up">↑ Moved up ${originalIndex - index}</span>`;
+                    changeClass = 'moved-up';
+                } else if (index > originalIndex) {
+                    changeIndicator = `<span class="change-indicator down">↓ Moved down ${index - originalIndex}</span>`;
+                    changeClass = 'moved-down';
+                }
+            }
+            
+            // Check if this is a new result (not in original top positions)
+            if (showActions && originalIndex >= 8) {
+                changeIndicator = `<span class="change-indicator new">NEW</span>`;
+                changeClass = 'new';
+            }
+            
+            const actions = showActions ? `
+                <div class="result-actions">
+                    ${index > 0 ? `<button class="action-btn promote" onclick="promoteResult(${result.id})">↑ Pin to Top</button>` : ''}
+                    <button class="action-btn remove" onclick="removeResult(${result.id})">✕ Remove</button>
+                </div>
+            ` : '';
+            
+            return `
+                <div class="result-item ${changeClass}">
+                    ${changeIndicator}
+                    <div class="result-header">
+                        <div class="result-position">#${index + 1}</div>
+                        <div class="result-title">${result.title}</div>
+                    </div>
+                    <div class="result-meta">
+                        <span class="meta-badge source">${result.source}</span>
+                        <span class="meta-badge type">${result.type}</span>
+                        <span class="meta-badge">${result.date}</span>
+                    </div>
+                    <div class="result-snippet">${result.snippet}</div>
+                    ${actions}
+                </div>
+            `;
+        }
+
+        function updateStats() {
+            const typeCount = {};
+            currentResults.forEach(r => {
+                typeCount[r.type] = (typeCount[r.type] || 0) + 1;
+            });
+            
+            const statsHtml = Object.entries(typeCount)
+                .map(([type, count]) => `<div class="stat-item"><span class="stat-label">${type}:</span><span class="stat-value">${count}</span></div>`)
+                .join('');
+            
+            const removed = removedIds.size > 0 ? `<div class="stat-item"><span class="stat-label">Removed:</span><span class="stat-value">${removedIds.size}</span></div>` : '';
+            
+            document.getElementById('stats-container').innerHTML = statsHtml + removed;
+        }
+
+        window.onload = initializeResults;
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="feature-banner">
+                <div class="feature-title">Counterfactual Explorer: Explore Alternative Rankings</div>
+            </div>
+
+            <div class="search-section">
+                <h1 class="search-title">Search</h1>
+                <div class="search-label">Query being audited:</div>
+                <div class="search-input-wrapper">
+                    <input type="text" class="search-input" value="climate change solutions" readonly>
+                </div>
+            </div>
+
+            <div class="header-title">Use the controls below to explore "what if" scenarios by adjusting ranking priorities</div>
+        </div>
+
+        <div class="controls-panel">
+            <div class="controls-header">
+                Adjustment Controls
+            </div>
+            <div class="controls-grid">
+                <div class="control-item">
+                    <div class="control-label">1. Recency Priority</div>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="recency-toggle" onchange="toggleRecency(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span style="font-size: 12px; color: #666;">Sort by newest first</span>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <div class="control-label">2. Source Diversity</div>
+                    <div style="display: flex; align-items: center; gap: 12px; margin-top: 8px;">
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="diversity-toggle" onchange="toggleDiversity(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span style="font-size: 12px; color: #666;">One result per domain</span>
+                    </div>
+                </div>
+
+                <div class="control-item">
+                    <div class="control-label">3. Group by Source Type</div>
+                    <select class="select-dropdown" id="grouping-select" onchange="applyGrouping()">
+                        <option value="none">No grouping</option>
+                        <option value="type">Group by type</option>
+                    </select>
+                </div>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 16px;">
+                <div style="font-size: 12px; color: #666;">
+                    Use buttons in adjusted results to pin/promote or remove individual results
+                </div>
+                <button class="reset-button" onclick="resetAdjustments()">↺ Reset All</button>
+            </div>
+        </div>
+
+        <div class="comparison-container">
+            <div class="results-panel">
+                <div class="panel-header">
+                    Original Ranking
+                    <span class="panel-badge">System Output</span>
+                </div>
+                <div id="original-results"></div>
+            </div>
+
+            <div class="results-panel">
+                <div class="panel-header">
+                    Your Adjustments
+                    <span class="panel-badge">Counterfactual View</span>
+                </div>
+                <div id="adjusted-results"></div>
+                <div class="stats-bar" id="stats-container"></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
