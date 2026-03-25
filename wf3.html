@@ -455,13 +455,15 @@
         // Original results data
         const originalResults = [
             {id: 1, title: 'IPCC Climate Change Mitigation Report', source: 'ipcc.ch', type: 'Government', date: '2023', snippet: 'Comprehensive assessment of strategies for reducing greenhouse gas emissions, including renewable energy deployment.'},
-            {id: 2, title: 'Climate Change - Wikipedia', source: 'wikipedia.org', type: 'Encyclopedia', date: '2024', snippet: 'Comprehensive encyclopedia entry covering climate science, global warming causes, and potential mitigation strategies.'},
-            {id: 3, title: 'UN Climate Summit Outcomes 2024', source: 'reuters.com', type: 'News', date: '2024', snippet: 'Latest developments from the international climate negotiations including emissions targets and renewable energy commitments.'},
-            {id: 4, title: 'Renewable Energy Technologies Overview', source: 'un.org', type: 'Government', date: '2021', snippet: 'Survey of current and emerging renewable energy technologies including solar photovoltaics, wind power, hydroelectric systems.'},
-            {id: 5, title: 'Carbon Sequestration Methods', source: 'wikipedia.org', type: 'Encyclopedia', date: '2023', snippet: 'Overview of carbon capture and storage technologies, natural carbon sinks, and geoengineering approaches.'},
-            {id: 6, title: 'Global Renewable Energy Growth Report', source: 'nytimes.com', type: 'News', date: '2024', snippet: 'Analysis of worldwide trends in solar, wind, and hydroelectric power adoption, showing record investment.'},
-            {id: 7, title: 'Paris Agreement - Wikipedia', source: 'wikipedia.org', type: 'Encyclopedia', date: '2022', snippet: 'International treaty on climate change adopted in 2015, with goals to limit global warming.'},
-            {id: 8, title: 'Climate Solutions in Policy Debates', source: 'reuters.com', type: 'News', date: '2024', snippet: 'Recent policy discussions on climate mitigation strategies, covering renewable energy mandates.'},
+            {id: 2, title: 'UN Climate Action Framework', source: 'un.org', type: 'Government', date: '2022', snippet: 'United Nations framework for global climate action, detailing emission reduction pathways and adaptation strategies.'},
+            {id: 3, title: 'Renewable Energy Technologies Guide', source: 'energy.gov', type: 'Government', date: '2021', snippet: 'Comprehensive guide to renewable energy technologies including solar, wind, hydroelectric, and geothermal systems.'},
+            {id: 4, title: 'Climate Policy Solutions Database', source: 'worldbank.org', type: 'Government', date: '2022', snippet: 'Searchable database of climate policies implemented worldwide, with case studies and effectiveness metrics.'},
+            {id: 5, title: 'Paris Agreement Implementation Guide', source: 'unfccc.int', type: 'Government', date: '2021', snippet: 'Detailed guidance on implementing Paris Agreement commitments and nationally determined contributions.'},
+            {id: 6, title: 'Climate Change Adaptation Strategies', source: 'un.org', type: 'Government', date: '2023', snippet: 'UN guidance on climate adaptation planning for communities, infrastructure, and natural resources.'},
+            {id: 7, title: 'Climate Change - Wikipedia', source: 'wikipedia.org', type: 'Encyclopedia', date: '2024', snippet: 'Comprehensive encyclopedia entry covering climate science, global warming causes, and potential mitigation strategies.'},
+            {id: 8, title: 'Carbon Reduction Strategies', source: 'nature.com', type: 'Academic', date: '2023', snippet: 'Peer-reviewed analysis of evidence-based carbon reduction strategies across industrial and agricultural sectors.'},
+            {id: 9, title: 'UN Climate Summit Outcomes 2024', source: 'reuters.com', type: 'News', date: '2024', snippet: 'Latest developments from international climate negotiations including emissions targets and renewable energy commitments.'},
+            {id: 10, title: 'Climate Solutions Overview', source: 'reuters.com', type: 'News', date: '2023', snippet: 'Overview of current climate change mitigation approaches being implemented globally, from renewable energy to sustainable agriculture.'},
         ];
 
         let currentResults = JSON.parse(JSON.stringify(originalResults));
@@ -474,21 +476,20 @@
         }
 
         function toggleRecency(checked) {
-            if (checked) {
-                // Sort by date (newer first)
-                currentResults = JSON.parse(JSON.stringify(originalResults))
-                    .filter(r => !removedIds.has(r.id))
-                    .sort((a, b) => parseInt(b.date) - parseInt(a.date));
-            } else {
-                // Original order
-                currentResults = JSON.parse(JSON.stringify(originalResults)).filter(r => !removedIds.has(r.id));
-            }
-            applyGrouping();
+            applyAllFilters();
         }
 
         function toggleDiversity(checked) {
-            if (checked) {
-                // Keep only first result per domain
+            applyAllFilters();
+        }
+
+        function applyAllFilters() {
+            // Start with original results (excluding removed ones)
+            currentResults = JSON.parse(JSON.stringify(originalResults)).filter(r => !removedIds.has(r.id));
+            
+            // Apply diversity filter first (if enabled)
+            const diversityToggle = document.getElementById('diversity-toggle');
+            if (diversityToggle.checked) {
                 const seenDomains = new Set();
                 currentResults = currentResults.filter(r => {
                     if (seenDomains.has(r.source)) {
@@ -497,11 +498,14 @@
                     seenDomains.add(r.source);
                     return true;
                 });
-            } else {
-                // Reset to full list
-                const recencyToggle = document.getElementById('recency-toggle');
-                toggleRecency(recencyToggle.checked);
             }
+            
+            // Apply recency sort (if enabled)
+            const recencyToggle = document.getElementById('recency-toggle');
+            if (recencyToggle.checked) {
+                currentResults.sort((a, b) => parseInt(b.date) - parseInt(a.date));
+            }
+            
             applyGrouping();
         }
 
@@ -522,28 +526,15 @@
 
         function removeResult(id) {
             removedIds.add(id);
-            currentResults = currentResults.filter(r => r.id !== id);
-            
-            // Add next result from original list if available
-            const originalLength = originalResults.length;
-            const currentLength = currentResults.length + removedIds.size;
-            if (currentLength < originalLength) {
-                const nextResult = originalResults[currentLength];
-                if (!removedIds.has(nextResult.id)) {
-                    currentResults.push(JSON.parse(JSON.stringify(nextResult)));
-                }
-            }
-            
-            applyGrouping();
+            applyAllFilters();
         }
 
         function resetAdjustments() {
-            currentResults = JSON.parse(JSON.stringify(originalResults));
             removedIds.clear();
             document.getElementById('recency-toggle').checked = false;
             document.getElementById('diversity-toggle').checked = false;
             document.getElementById('grouping-select').value = 'none';
-            applyGrouping();
+            applyAllFilters();
         }
 
         function renderResults(containerId, results, showActions, grouping = 'none') {
@@ -589,7 +580,7 @@
             }
             
             // Check if this is a new result (not in original top positions)
-            if (showActions && originalIndex >= 8) {
+            if (showActions && originalIndex >= 10) {
                 changeIndicator = `<span class="change-indicator new">NEW</span>`;
                 changeClass = 'new';
             }
