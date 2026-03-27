@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consent Form</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #f5f5f5;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: white;
+            padding: 24px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .feature-banner {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: #1976D2;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+        }
+
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .search-section {
+            margin-top: 24px;
+        }
+
+        .search-title {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .search-label {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: #333;
+        }
+
+        .search-input-wrapper {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 16px 20px;
+            font-size: 18px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            background: #F5F5F5;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .header-title {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 16px;
+        }
+
+        .controls-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .controls-header {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #1976D2;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+        }
+
+        .control-item {
+            padding: 12px;
+            background: #FAFAFA;
+            border-radius: 6px;
+            border: 1px solid #E0E0E0;
+        }
+
+        .control-label {
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        .slider-container {
+            margin-top: 8px;
+        }
+
+        .slider {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: #E0E0E0;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .slider::-webkit-slider-thumb {
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #2196F3;
+            cursor: pointer;
+        }
+
+        .slider-labels {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            font-size: 10px;
+            color: #999;
+        }
+
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 24px;
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 18px;
+            width: 18px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+        }
+
+        input:checked + .toggle-slider {
+            background-color: #2196F3;
+        }
+
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+
+        .select-dropdown {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #E0E0E0;
+            border-radius: 4px;
+            background: white;
+            font-size: 13px;
+            cursor: pointer;
+        }
+
+        .reset-button {
+            padding: 8px 16px;
+            background: #F5F5F5;
+            border: 1px solid #E0E0E0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .reset-button:hover {
+            background: #EEEEEE;
+        }
+
+        .comparison-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .results-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .panel-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #E0E0E0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .panel-badge {
+            font-size: 11px;
+            padding: 4px 8px;
+            background: #E3F2FD;
+            color: #1976D2;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .result-item {
+            padding: 16px;
+            margin-bottom: 12px;
+            border: 2px solid #E0E0E0;
+            border-radius: 8px;
+            background: white;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .result-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .result-item.moved-up {
+            border-color: #4CAF50;
+            background: #F1F8F4;
+        }
+
+        .result-item.moved-down {
+            border-color: #FF9800;
+            background: #FFF8F0;
+        }
+
+        .result-item.removed {
+            border-color: #999;
+            background: #F5F5F5;
+            opacity: 0.6;
+        }
+
+        .result-item.new {
+            border-color: #2196F3;
+            background: #E3F2FD;
+        }
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 8px;
+        }
+
+        .result-position {
+            font-size: 14px;
+            font-weight: 700;
+            color: #1976D2;
+            min-width: 30px;
+        }
+
+        .result-title {
+            flex: 1;
+            font-size: 15px;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin: 0 12px;
+        }
+
+        .result-meta {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .meta-badge {
+            font-size: 11px;
+            padding: 3px 8px;
+            background: #F5F5F5;
+            border-radius: 12px;
+            color: #666;
+        }
+
+        .meta-badge.source {
+            background: #E8F5E9;
+            color: #2E7D32;
+        }
+
+        .meta-badge.type {
+            background: #E3F2FD;
+            color: #1976D2;
+        }
+
+        .result-snippet {
+            font-size: 13px;
+            line-height: 1.5;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .result-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            font-size: 11px;
+            border: 1px solid #E0E0E0;
+            border-radius: 4px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .action-btn:hover {
+            background: #F5F5F5;
+            border-color: #2196F3;
+            color: #2196F3;
+        }
+
+        .action-btn.promote {
+            border-color: #4CAF50;
+            color: #4CAF50;
+        }
+
+        .action-btn.promote:hover {
+            background: #E8F5E9;
+        }
+
+        .action-btn.remove {
+            border-color: #F44336;
+            color: #F44336;
+        }
+
+        .action-btn.remove:hover {
+            background: #FFEBEE;
+        }
+
+        .change-indicator {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            font-size: 11px;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .change-indicator.up {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .change-indicator.down {
+            background: #FF9800;
+            color: white;
+        }
+
+        .change-indicator.new {
+            background: #2196F3;
+            color: white;
+        }
+
+        .change-indicator.removed {
+            background: #999;
+            color: white;
+        }
+
+        .group-header {
+            font-size: 13px;
+            font-weight: 600;
+            color: #1976D2;
+            margin: 16px 0 8px 0;
+            padding: 8px 12px;
+            background: #E3F2FD;
+            border-radius: 4px;
+        }
+
+        .stats-bar {
+            display: flex;
+            gap: 16px;
+            padding: 12px;
+            background: #FFF9E6;
+            border-radius: 6px;
+            margin-top: 16px;
+            border-left: 4px solid #FFC107;
+        }
+
+        .stat-item {
+            font-size: 12px;
+        }
+
+        .stat-label {
+            color: #F57F17;
+            font-weight: 600;
+        }
+
+        .stat-value {
+            color: #666;
+            margin-left: 4px;
+        }
+    </style>
+   
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+          <h1>Consent Form</h1>
+        </div>  
+            <div>
+                <p><b>By taking part in this study, you are consenting to the following statements:</b></p>
+            </div>
+            <br>
+
+            <div>
+            
+                <p>I confirm that I have read and understood the Participant Information Sheet for this survey</p>
+            </div>
+            <br>
+
+            <div>
+                <p>I understand that my participation is voluntary and that I am free to exit the survey at any time, without giving any reason.</p>
+            </div>
+             <br>
+
+            <div>
+                <p>I agree that the survey responses will be anonymous.</p>
+            </div>
+             <br>
+
+            <div>
+                <p>I agree that the survey responses will be securely stored.</p>
+            </div>
+             <br>
+
+            <div>
+                <p>I agree that the survey responses will be destroyed once the project is complete.</p>
+            </div>
+             <br>
+
+            <div>
+                <p>I agree that the material may be used in future publications, both print and online.</p>
+            </div>
+             <br> 
+
+            <div>
+                <p>I agree that I waive my copyright to any data collected as part of this project.</p>
+            </div>
+             <br>
+            
+            <div>
+                <p>I agree that other authenticated researchers may use my survey responses in publications, reports, web pages, and other research outputs, only if they agree to preserve the confidentiality of the information as requested in this form.</p>
+            </div>
+             <br> 
+             
+            <div>
+                <p>I agree to take part in this research study.</p>
+            </div>
+             <br> 
+           
+           
+
+
+            <br>
+</div>
+                
+</body>
+</html>
