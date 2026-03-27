@@ -212,18 +212,21 @@
         }
 
         .ranker-note {
-            background: #FFF9E6;
-            padding: 12px 16px;
-            border-radius: 6px;
-            border-left: 4px solid #FFC107;
-            margin-top: 16px;
-            font-size: 12px;
-            color: #666;
+            background: #E3F2FD;
+            padding: 20px 24px;
+            border-radius: 8px;
+            border: 3px solid #1976D2;
+            margin-top: 20px;
+            font-size: 15px;
+            color: #0D47A1;
             line-height: 1.6;
+            font-weight: 500;
         }
 
         .ranker-note strong {
-            color: #F57F17;
+            color: #1976D2;
+            font-size: 16px;
+            font-weight: 700;
         }
 
         .insights-panel {
@@ -254,17 +257,6 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-        }
-
-        .insight-box2 {
-            padding: 12px;
-            background: #FAFAFA;
-            border-radius: 6px;
-            border: 1px solid #E0E0E0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
         }
 
         .insight-label {
@@ -436,7 +428,7 @@
 
         .results-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr 1fr 1fr;
             gap: 16px;
         }
 
@@ -460,7 +452,7 @@
         // All results with their BM25 and MonoT5 positions
         const allResults = [
             {id: 1, title: 'Climate Change - Wikipedia', source: 'wikipedia.org', type: 'Encyclopedia', snippet: 'Comprehensive encyclopedia entry covering climate science, global warming causes, and potential mitigation strategies including policy approaches and international agreements.', bm25: 1, monot5: 7},
-            {id: 2, title: 'Climate Change Solutions - Best Top 10 Climate Solutions Guide', source: 'climatesolutionsinfo.com', type: 'Commercial', snippet: 'Ultimate guide to best climate change solutions with best top tips for solving climate change. Best climate solutions and best climate action strategies for climate change mitigation.', bm25: 2, monot5: 10},
+            {id: 2, title: 'Climate Change Solutions - Best Top 10 Climate Solutions Guide', source: 'climatesolutionsinfo.com', type: 'Commercial', snippet: 'Guide to climate change solutions with top tips for solving climate change. Best climate change solutions and climate action strategies for climate change mitigation.', bm25: 2, monot5: 10},
             {id: 3, title: 'IPCC Climate Change Mitigation Report', source: 'ipcc.ch', type: 'Government', snippet: 'Comprehensive scientific assessment of strategies for reducing greenhouse gas emissions, including renewable energy deployment, energy efficiency improvements, and carbon capture technologies.', bm25: 4, monot5: 1},
             {id: 4, title: 'UN Climate Action Framework', source: 'un.org', type: 'Government', snippet: 'United Nations framework for global climate action, detailing emission reduction pathways, adaptation strategies, and international cooperation mechanisms.', bm25: 7, monot5: 2},
             {id: 5, title: 'Climate Solutions Overview', source: 'greennews.org', type: 'News', snippet: 'Overview of current climate change mitigation approaches being implemented globally, from renewable energy to sustainable agriculture practices.', bm25: 3, monot5: 8},
@@ -622,7 +614,7 @@
                                 <div class="insight-label">Source Type Distribution</div>
                                 <div id="distribution-bars" class="distribution-bars"></div>
                             </div>
-                            <div class="insight-box2">
+                            <div class="insight-box">
                                 <div class="insight-label">Results with Large Position Changes</div>
                                 <div class="insight-value" id="large-movements">-</div>
                                 <div style="font-size: 11px; color: #999; margin-top: 4px;">Changed 3+ positions between rankers</div>
