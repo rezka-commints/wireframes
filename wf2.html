@@ -170,9 +170,9 @@
         }
 
         .stage-corpus {
-            background: #E8EAF6;
-            color: #3F51B5;
-            border: 2px solid #5C6BC0;
+            background: #F5F5F5;
+            color: #757575;
+            border: 2px solid #BDBDBD;
         }
 
         .stage-ranker {
@@ -211,106 +211,6 @@
             color: #999;
         }
 
-        .ranker-note {
-            background: #E3F2FD;
-            padding: 20px 24px;
-            border-radius: 8px;
-            border: 3px solid #1976D2;
-            margin-top: 20px;
-            font-size: 15px;
-            color: #0D47A1;
-            line-height: 1.6;
-            font-weight: 500;
-        }
-
-        .ranker-note strong {
-            color: #1976D2;
-            font-size: 16px;
-            font-weight: 700;
-        }
-
-        .insights-panel {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 16px;
-        }
-
-        .insights-header {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1976D2;
-            margin-bottom: 16px;
-        }
-
-        .insights-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-
-        .insight-box {
-            padding: 12px;
-            background: #FAFAFA;
-            border-radius: 6px;
-            border: 1px solid #E0E0E0;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .insight-label {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: #999;
-            margin-bottom: 8px;
-        }
-
-        .insight-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: #1976D2;
-        }
-
-        .distribution-bars {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 8px;
-        }
-
-        .dist-bar {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .dist-label {
-            width: 80px;
-            font-size: 12px;
-            color: #666;
-        }
-
-        .dist-track {
-            flex: 1;
-            height: 20px;
-            background: #F5F5F5;
-            border-radius: 4px;
-            overflow: hidden;
-            position: relative;
-        }
-
-        .dist-fill {
-            height: 100%;
-            background: #2196F3;
-            display: flex;
-            align-items: center;
-            padding: 0 6px;
-            font-size: 11px;
-            font-weight: 600;
-            color: white;
-        }
-
         .results-title {
             font-size: 24px;
             font-weight: 700;
@@ -339,6 +239,7 @@
             font-weight: 700;
             color: #1976D2;
             min-width: 30px;
+            display: none;  /* Hidden in both views */
         }
 
         .result-title {
@@ -354,7 +255,7 @@
             gap: 8px;
             margin-bottom: 8px;
             flex-wrap: wrap;
-            margin-left: 42px;
+            margin-left: 0;  /* No position number, so no left margin */
         }
 
         .meta-badge {
@@ -385,8 +286,8 @@
         }
 
         .meta-badge.type-commercial {
-            background: #8dd6b5;
-            color: #F57C00;
+            background: #FCE4EC;
+            color: #C2185B;
         }
 
         .meta-badge.type-encyclopedia {
@@ -398,32 +299,16 @@
             font-size: 13px;
             line-height: 1.6;
             color: #666;
-            margin-left: 42px;
+            margin-left: 0;  /* No position number, so no left margin */
         }
 
-        .rank-shift {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            font-size: 11px;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-weight: 600;
-        }
-
-        .rank-shift.up {
-            background: #E8F5E9;
-            color: #2E7D32;
-        }
-
-        .rank-shift.down {
-            background: #FFEBEE;
-            color: #C62828;
-        }
-
-        .rank-shift.same {
-            background: #F5F5F5;
-            color: #999;
+        /* Grid view specific snippet styling */
+        .results-grid .result-snippet {
+            font-size: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .results-list {
@@ -437,14 +322,6 @@
             gap: 16px;
         }
 
-        .results-grid .result-snippet {
-            font-size: 12px;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-
         .results-container {
             transition: opacity 0.3s ease;
         }
@@ -454,21 +331,21 @@
         }
     </style>
     <script>
-        // All results with their BM25 and MonoT5 positions
+        // All results with their Ranker A and Ranker B positions
         const allResults = [
-            {id: 1, title: 'Climate Change - Wikipedia', source: 'wikipedia.org', type: 'Encyclopedia', snippet: 'Comprehensive encyclopedia entry covering climate science, global warming causes, and potential mitigation strategies including policy approaches and international agreements.', bm25: 1, monot5: 7},
-            {id: 2, title: 'Climate Change Solutions - Best Top 10 Climate Solutions Guide', source: 'climatesolutionsinfo.com', type: 'Commercial', snippet: 'Guide to climate change solutions with top tips for solving climate change. Best climate change solutions and climate action strategies for climate change mitigation.', bm25: 2, monot5: 10},
-            {id: 3, title: 'IPCC Climate Change Mitigation Report', source: 'ipcc.ch', type: 'Government', snippet: 'Comprehensive scientific assessment of strategies for reducing greenhouse gas emissions, including renewable energy deployment, energy efficiency improvements, and carbon capture technologies.', bm25: 4, monot5: 1},
-            {id: 4, title: 'UN Climate Action Framework', source: 'un.org', type: 'Government', snippet: 'United Nations framework for global climate action, detailing emission reduction pathways, adaptation strategies, and international cooperation mechanisms.', bm25: 7, monot5: 2},
-            {id: 5, title: 'Climate Solutions Overview', source: 'greennews.org', type: 'News', snippet: 'Overview of current climate change mitigation approaches being implemented globally, from renewable energy to sustainable agriculture practices.', bm25: 3, monot5: 8},
-            {id: 6, title: 'Carbon Reduction Strategies', source: 'nature.com', type: 'Academic', snippet: 'Peer-reviewed analysis of evidence-based carbon reduction strategies across industrial, agricultural, and energy sectors, with effectiveness assessments.', bm25: 9, monot5: 3},
-            {id: 7, title: 'Renewable Energy Technologies Guide', source: 'energy.gov', type: 'Government', snippet: 'Comprehensive guide to renewable energy technologies including solar, wind, hydroelectric, and geothermal systems, with implementation roadmaps.', bm25: 8, monot5: 4},
-            {id: 8, title: 'Climate Policy Solutions Database', source: 'worldbank.org', type: 'Government', snippet: 'Searchable database of climate policies and solutions implemented worldwide, with case studies and effectiveness metrics from various countries.', bm25: 6, monot5: 5},
-            {id: 9, title: 'Paris Agreement Implementation Guide', source: 'unfccc.int', type: 'Government', snippet: 'Detailed guidance on implementing Paris Agreement commitments, including nationally determined contributions and climate finance mechanisms.', bm25: 10, monot5: 6},
-            {id: 10, title: 'Addressing Climate Change Today', source: 'climatenow.org', type: 'News', snippet: 'Current news and updates on climate change initiatives, featuring recent policy developments and technological innovations in climate mitigation.', bm25: 5, monot5: 9}
+            {id: 1, title: 'Climate Change - Wikipedia', source: 'wikipedia.org', type: 'Encyclopedia', snippet: 'Comprehensive encyclopedia entry covering climate science, global warming causes, and potential mitigation strategies including policy approaches and international agreements.', rankerA: 1, rankerB: 7},
+            {id: 2, title: 'Climate Change Solutions - Best Top 10 Climate Solutions Guide', source: 'climatesolutionsinfo.com', type: 'Commercial', snippet: 'Guide to climate change solutions with top tips for solving climate change. Best climate change solutions and climate action strategies for climate change mitigation.', rankerA: 2, rankerB: 10},
+            {id: 3, title: 'IPCC Climate Change Mitigation Report', source: 'ipcc.ch', type: 'Government', snippet: 'Comprehensive scientific assessment of strategies for reducing greenhouse gas emissions, including renewable energy deployment, energy efficiency improvements, and carbon capture technologies.', rankerA: 4, rankerB: 1},
+            {id: 4, title: 'UN Climate Action Framework', source: 'un.org', type: 'Government', snippet: 'United Nations framework for global climate action, detailing emission reduction pathways, adaptation strategies, and international cooperation mechanisms.', rankerA: 7, rankerB: 2},
+            {id: 5, title: 'Climate Solutions Overview', source: 'greennews.org', type: 'News', snippet: 'Overview of current climate change mitigation approaches being implemented globally, from renewable energy to sustainable agriculture practices.', rankerA: 3, rankerB: 8},
+            {id: 6, title: 'Carbon Reduction Strategies', source: 'nature.com', type: 'Academic', snippet: 'Peer-reviewed analysis of evidence-based carbon reduction strategies across industrial, agricultural, and energy sectors, with effectiveness assessments.', rankerA: 9, rankerB: 3},
+            {id: 7, title: 'Renewable Energy Technologies Guide', source: 'energy.gov', type: 'Government', snippet: 'Comprehensive guide to renewable energy technologies including solar, wind, hydroelectric, and geothermal systems, with implementation roadmaps.', rankerA: 8, rankerB: 4},
+            {id: 8, title: 'Climate Policy Solutions Database', source: 'worldbank.org', type: 'Government', snippet: 'Searchable database of climate policies and solutions implemented worldwide, with case studies and effectiveness metrics from various countries.', rankerA: 6, rankerB: 5},
+            {id: 9, title: 'Paris Agreement Implementation Guide', source: 'unfccc.int', type: 'Government', snippet: 'Detailed guidance on implementing Paris Agreement commitments, including nationally determined contributions and climate finance mechanisms.', rankerA: 10, rankerB: 6},
+            {id: 10, title: 'Addressing Climate Change Today', source: 'climatenow.org', type: 'News', snippet: 'Current news and updates on climate change initiatives, featuring recent policy developments and technological innovations in climate mitigation.', rankerA: 5, rankerB: 9}
         ];
 
-        let currentRanker = 'bm25';
+        let currentRanker = 'rankerA';
         let currentPresentation = 'list';
 
         function togglePipeline(element) {
@@ -483,7 +360,7 @@
         }
 
         function toggleRanker() {
-            currentRanker = currentRanker === 'bm25' ? 'monot5' : 'bm25';
+            currentRanker = currentRanker === 'rankerA' ? 'rankerB' : 'rankerA';
             updateDisplay();
         }
 
@@ -494,16 +371,11 @@
 
         function updateDisplay() {
             // Update pipeline labels
-            document.getElementById('ranker-value').textContent = currentRanker === 'bm25' ? 'Ranker A' : 'Ranker B';
+            document.getElementById('ranker-value').textContent = currentRanker === 'rankerA' ? 'Ranker A' : 'Ranker B';
             document.getElementById('presentation-value').textContent = currentPresentation === 'list' ? 'List View' : 'Grid View';
-
-            // Update ranker description
 
             // Sort results by current ranker
             const sortedResults = [...allResults].sort((a, b) => a[currentRanker] - b[currentRanker]);
-
-            // Calculate insights
-            updateInsights(sortedResults);
 
             // Render results
             const resultsElement = document.getElementById('results-list');
@@ -524,38 +396,6 @@
                     </div>
                 `;
             }).join('');
-        }
-
-        function updateInsights(sortedResults) {
-            // Calculate source type distribution
-            const distribution = {};
-            sortedResults.forEach(r => {
-                distribution[r.type] = (distribution[r.type] || 0) + 1;
-            });
-
-            const distHTML = Object.entries(distribution)
-                .sort((a, b) => b[1] - a[1])
-                .map(([type, count]) => {
-                    const percentage = (count / 10) * 100;
-                    return `
-                        <div class="dist-bar">
-                            <div class="dist-label">${type}</div>
-                            <div class="dist-track">
-                                <div class="dist-fill" style="width: ${percentage}%">${count}</div>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-            document.getElementById('distribution-bars').innerHTML = distHTML;
-
-            // Calculate large movements
-            const largeMovements = allResults.filter(r => {
-                const diff = Math.abs(r.bm25 - r.monot5);
-                return diff >= 3;
-            }).length;
-
-            document.getElementById('large-movements').textContent = largeMovements;
         }
 
         window.onload = updateDisplay;
@@ -588,7 +428,7 @@
                     <div class="pipeline-interactive">
                         <div class="pipeline-stage stage-corpus">
                             <div class="stage-label">Corpus</div>
-                            <div class="stage-value">Wikipedia</div>
+                            <div class="stage-value">—</div>
                         </div>
                         <div class="arrow">→</div>
                         <div class="pipeline-stage stage-ranker" onclick="toggleRanker()">
@@ -601,21 +441,6 @@
                             <div class="stage-label">Presentation</div>
                             <div class="stage-value" id="presentation-value">List View</div>
                             <div class="stage-hint">Click to toggle</div>
-                        </div>
-                    </div>
-
-                    <div class="insights-panel">
-                        <div class="insights-header">Ranking Insights</div>
-                        <div class="insights-grid">
-                            <div class="insight-box">
-                                <div class="insight-label">Source Type Distribution</div>
-                                <div id="distribution-bars" class="distribution-bars"></div>
-                            </div>
-                            <div class="insight-box">
-                                <div class="insight-label">Results with Large Position Changes</div>
-                                <div class="insight-value" id="large-movements">-</div>
-                                <div style="font-size: 11px; color: #999; margin-top: 4px;">Changed 3+ positions between rankers</div>
-                            </div>
                         </div>
                     </div>
                 </div>
