@@ -324,19 +324,38 @@
         .meta-badge {
             font-size: 11px;
             padding: 3px 8px;
-            background: #F5F5F5;
             border-radius: 12px;
-            color: #666;
+            font-weight: 500;
         }
 
         .meta-badge.source {
+            background: #e3e5e8;
+            color: #5b5b5c;
+        }
+
+        .meta-badge.type-government {
             background: #E8F5E9;
             color: #2E7D32;
         }
 
-        .meta-badge.type {
+        .meta-badge.type-academic {
             background: #E3F2FD;
             color: #1976D2;
+        }
+
+        .meta-badge.type-news {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+
+        .meta-badge.type-encyclopedia {
+            background: #F3E5F5;
+            color: #7B1FA2;
+        }
+
+        .meta-badge.date {
+            background: #F5F5F5;
+            color: #999;
         }
 
         .result-snippet {
@@ -433,7 +452,7 @@
             padding: 12px;
             background: #FFF9E6;
             border-radius: 6px;
-            margin-top: 16px;
+            margin-bottom: 16px;
             border-left: 4px solid #FFC107;
         }
 
@@ -452,25 +471,27 @@
         }
     </style>
     <script>
-        // Original results data
+        // Original results data (includes 12 results so diversity filter can still show 10)
         const originalResults = [
             {id: 1, title: 'IPCC Climate Change Mitigation Report', source: 'ipcc.ch', type: 'Government', date: '2023', snippet: 'Comprehensive assessment of strategies for reducing greenhouse gas emissions, including renewable energy deployment.'},
-            {id: 2, title: 'UN Climate Action Framework', source: 'un.org', type: 'Government', date: '2022', snippet: 'United Nations framework for global climate action, detailing emission reduction pathways and adaptation strategies.'},
-            {id: 3, title: 'Renewable Energy Technologies Guide', source: 'energy.gov', type: 'Government', date: '2021', snippet: 'Comprehensive guide to renewable energy technologies including solar, wind, hydroelectric, and geothermal systems.'},
-            {id: 4, title: 'Climate Policy Solutions Database', source: 'worldbank.org', type: 'Government', date: '2022', snippet: 'Searchable database of climate policies implemented worldwide, with case studies and effectiveness metrics.'},
-            {id: 5, title: 'Paris Agreement Implementation Guide', source: 'unfccc.int', type: 'Government', date: '2021', snippet: 'Detailed guidance on implementing Paris Agreement commitments and nationally determined contributions.'},
-            {id: 6, title: 'Climate Change Adaptation Strategies', source: 'un.org', type: 'Government', date: '2023', snippet: 'UN guidance on climate adaptation planning for communities, infrastructure, and natural resources.'},
-            {id: 7, title: 'Climate Change - Wikipedia', source: 'wikipedia.org', type: 'Encyclopedia', date: '2024', snippet: 'Comprehensive encyclopedia entry covering climate science, global warming causes, and potential mitigation strategies.'},
-            {id: 8, title: 'Carbon Reduction Strategies', source: 'nature.com', type: 'Academic', date: '2023', snippet: 'Peer-reviewed analysis of evidence-based carbon reduction strategies across industrial and agricultural sectors.'},
-            {id: 9, title: 'UN Climate Summit Outcomes 2024', source: 'reuters.com', type: 'News', date: '2024', snippet: 'Latest developments from international climate negotiations including emissions targets and renewable energy commitments.'},
-            {id: 10, title: 'Climate Solutions Overview', source: 'reuters.com', type: 'News', date: '2023', snippet: 'Overview of current climate change mitigation approaches being implemented globally, from renewable energy to sustainable agriculture.'},
+            {id: 2, title: 'Climate Change - Wikipedia', source: 'wikipedia.org', type: 'Encyclopedia', date: '2024', snippet: 'Comprehensive encyclopedia entry covering climate science, global warming causes, and potential mitigation strategies.'},
+            {id: 3, title: 'UN Climate Action Framework', source: 'un.org', type: 'Government', date: '2022', snippet: 'United Nations framework for global climate action, detailing emission reduction pathways and adaptation strategies.'},
+            {id: 4, title: 'UN Climate Summit Outcomes 2024', source: 'reuters.com', type: 'News', date: '2024', snippet: 'Latest developments from international climate negotiations including emissions targets and renewable energy commitments.'},
+            {id: 5, title: 'Renewable Energy Technologies Guide', source: 'energy.gov', type: 'Government', date: '2021', snippet: 'Comprehensive guide to renewable energy technologies including solar, wind, hydroelectric, and geothermal systems.'},
+            {id: 6, title: 'Carbon Reduction Strategies', source: 'nature.com', type: 'Academic', date: '2023', snippet: 'Peer-reviewed analysis of evidence-based carbon reduction strategies across industrial and agricultural sectors.'},
+            {id: 7, title: 'Climate Policy Solutions Database', source: 'worldbank.org', type: 'Government', date: '2022', snippet: 'Searchable database of climate policies implemented worldwide, with case studies and effectiveness metrics.'},
+            {id: 8, title: 'Climate Solutions Overview', source: 'reuters.com', type: 'News', date: '2023', snippet: 'Overview of current climate change mitigation approaches being implemented globally, from renewable energy to sustainable agriculture.'},
+            {id: 9, title: 'Paris Agreement Implementation Guide', source: 'unfccc.int', type: 'Government', date: '2021', snippet: 'Detailed guidance on implementing Paris Agreement commitments and nationally determined contributions.'},
+            {id: 10, title: 'Climate Change Adaptation Strategies', source: 'un.org', type: 'Government', date: '2023', snippet: 'UN guidance on climate adaptation planning for communities, infrastructure, and natural resources.'},
+            {id: 11, title: 'Global Warming Solutions', source: 'sciencedaily.com', type: 'News', date: '2024', snippet: 'Recent scientific breakthroughs in climate mitigation, from carbon capture technology to renewable energy innovations.'},
+            {id: 12, title: 'Climate Science Fundamentals', source: 'climate.mit.edu', type: 'Academic', date: '2022', snippet: 'Educational resource explaining the fundamental science behind climate change and potential solutions.'},
         ];
 
-        let currentResults = JSON.parse(JSON.stringify(originalResults));
+        let currentResults = JSON.parse(JSON.stringify(originalResults.slice(0, 10)));
         let removedIds = new Set();
 
         function initializeResults() {
-            renderResults('original-results', originalResults, false);
+            renderResults('original-results', originalResults.slice(0, 10), false);
             renderResults('adjusted-results', currentResults, true);
             updateStats();
         }
@@ -484,11 +505,19 @@
         }
 
         function applyAllFilters() {
-            // Start with original results (excluding removed ones)
-            currentResults = JSON.parse(JSON.stringify(originalResults)).filter(r => !removedIds.has(r.id));
-            
-            // Apply diversity filter first (if enabled)
             const diversityToggle = document.getElementById('diversity-toggle');
+            const recencyToggle = document.getElementById('recency-toggle');
+            
+            // Start with results based on whether diversity is enabled
+            if (diversityToggle.checked) {
+                // Use all 12 results when diversity is ON (need backups to fill in)
+                currentResults = JSON.parse(JSON.stringify(originalResults)).filter(r => !removedIds.has(r.id));
+            } else {
+                // Use only top 10 when diversity is OFF (no backups needed)
+                currentResults = JSON.parse(JSON.stringify(originalResults.slice(0, 10))).filter(r => !removedIds.has(r.id));
+            }
+            
+            // Apply diversity filter (if enabled)
             if (diversityToggle.checked) {
                 const seenDomains = new Set();
                 currentResults = currentResults.filter(r => {
@@ -498,10 +527,11 @@
                     seenDomains.add(r.source);
                     return true;
                 });
+                // Take top 10 after diversity filtering
+                currentResults = currentResults.slice(0, 10);
             }
             
             // Apply recency sort (if enabled)
-            const recencyToggle = document.getElementById('recency-toggle');
             if (recencyToggle.checked) {
                 currentResults.sort((a, b) => parseInt(b.date) - parseInt(a.date));
             }
@@ -570,25 +600,25 @@
             let changeClass = '';
             
             if (showActions && originalIndex !== -1) {
-                if (index < originalIndex) {
-                    changeIndicator = `<span class="change-indicator up">↑ Moved up ${originalIndex - index}</span>`;
+                if (index < originalIndex && originalIndex < 10) {
+                    // Moved up from original top 10
+                    changeIndicator = `<span class="change-indicator up">Moved up ${originalIndex - index}</span>`;
                     changeClass = 'moved-up';
-                } else if (index > originalIndex) {
-                    changeIndicator = `<span class="change-indicator down">↓ Moved down ${index - originalIndex}</span>`;
+                } else if (index > originalIndex && originalIndex < 10) {
+                    // Moved down within top 10
+                    changeIndicator = `<span class="change-indicator down">Moved down ${index - originalIndex}</span>`;
                     changeClass = 'moved-down';
+                } else if (originalIndex >= 10) {
+                    // New result from backup pool
+                    changeIndicator = `<span class="change-indicator new">NEW</span>`;
+                    changeClass = 'new';
                 }
-            }
-            
-            // Check if this is a new result (not in original top positions)
-            if (showActions && originalIndex >= 10) {
-                changeIndicator = `<span class="change-indicator new">NEW</span>`;
-                changeClass = 'new';
             }
             
             const actions = showActions ? `
                 <div class="result-actions">
-                    ${index > 0 ? `<button class="action-btn promote" onclick="promoteResult(${result.id})">↑ Pin to Top</button>` : ''}
-                    <button class="action-btn remove" onclick="removeResult(${result.id})">✕ Remove</button>
+                    ${index > 0 ? `<button class="action-btn promote" onclick="promoteResult(${result.id})">Pin to Top</button>` : ''}
+                    <button class="action-btn remove" onclick="removeResult(${result.id})">Remove</button>
                 </div>
             ` : '';
             
@@ -601,8 +631,8 @@
                     </div>
                     <div class="result-meta">
                         <span class="meta-badge source">${result.source}</span>
-                        <span class="meta-badge type">${result.type}</span>
-                        <span class="meta-badge">${result.date}</span>
+                        <span class="meta-badge type-${result.type.toLowerCase()}">${result.type}</span>
+                        <span class="meta-badge date">${result.date}</span>
                     </div>
                     <div class="result-snippet">${result.snippet}</div>
                     ${actions}
@@ -686,7 +716,7 @@
                 <div style="font-size: 12px; color: #666;">
                     Use buttons in adjusted results to pin/promote or remove individual results
                 </div>
-                <button class="reset-button" onclick="resetAdjustments()">↺ Reset All</button>
+                <button class="reset-button" onclick="resetAdjustments()">Reset All</button>
             </div>
         </div>
 
@@ -704,8 +734,8 @@
                     Your Adjustments
                     <span class="panel-badge">Counterfactual View</span>
                 </div>
-                <div id="adjusted-results"></div>
                 <div class="stats-bar" id="stats-container"></div>
+                <div id="adjusted-results"></div>
             </div>
         </div>
     </div>
