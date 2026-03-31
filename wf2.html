@@ -489,14 +489,10 @@
 
         function updateDisplay() {
             // Update pipeline labels
-            document.getElementById('ranker-value').textContent = currentRanker === 'bm25' ? 'BM25' : 'MonoT5';
+            document.getElementById('ranker-value').textContent = currentRanker === 'bm25' ? 'Ranker A' : 'Ranker B';
             document.getElementById('presentation-value').textContent = currentPresentation === 'list' ? 'List View' : 'Grid View';
 
             // Update ranker description
-            const rankerDesc = currentRanker === 'bm25' 
-                ? 'BM25 is a lexical ranking algorithm that prioritizes exact keyword matches in titles and content.'
-                : 'MonoT5 is a neural semantic ranker that understands query intent and document meaning beyond keyword matching.';
-            document.getElementById('ranker-description').textContent = rankerDesc;
 
             // Sort results by current ranker
             const sortedResults = [...allResults].sort((a, b) => a[currentRanker] - b[currentRanker]);
@@ -592,7 +588,7 @@
                         <div class="arrow">→</div>
                         <div class="pipeline-stage stage-ranker" onclick="toggleRanker()">
                             <div class="stage-label">Ranker</div>
-                            <div class="stage-value" id="ranker-value">BM25</div>
+                            <div class="stage-value" id="ranker-value">Ranker A</div>
                             <div class="stage-hint">Click to toggle</div>
                         </div>
                         <div class="arrow">→</div>
@@ -601,10 +597,6 @@
                             <div class="stage-value" id="presentation-value">List View</div>
                             <div class="stage-hint">Click to toggle</div>
                         </div>
-                    </div>
-
-                    <div class="ranker-note">
-                        <strong>About this ranker:</strong> <span id="ranker-description">BM25 is a lexical ranking algorithm that prioritizes exact keyword matches in titles and content.</span>
                     </div>
 
                     <div class="insights-panel">
